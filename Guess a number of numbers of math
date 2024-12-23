@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+    #app {
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: #fff;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .hidden {
+      display: none;
+    }
+    .settings-option {
+      margin: 10px 0;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+      <h1>Welcome to the Game!</h1>
+      <p>Click OK to continue.</p>
+      <button onclick="showMenu()">OK</button>
+    </div>
+
+    <!-- Menu Screen -->
+    <div id="menu-screen" class="hidden">
+      <h1>Main Menu</h1>
+      <button onclick="startGame()">Play</button>
+      <button onclick="showSettings()">Settings</button>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="hidden">
+      <h1>Settings</h1>
+      <div class="settings-option">
+        <label for="brightness">Brightness: </label>
+        <input type="range" id="brightness" min="1" max="100" value="50">
+      </div>
+      <div class="settings-option">
+        <label for="volume">Sound: </label>
+        <input type="range" id="volume" min="1" max="100" value="50">
+      </div>
+      <button onclick="showMenu()">Back to Menu</button>
+    </div>
+
+    <!-- Play Screen -->
+    <div id="play-screen" class="hidden">
+      <h1>Number Guessing Game</h1>
+      <p id="level-info">Level 1: Guess a number between 1 and 50</p>
+      <p id="attempts-info">Attempts Left: 5</p>
+      <input type="number" id="guess" placeholder="Enter your guess">
+      <button onclick="submitGuess()">Submit Guess</button>
+      <button onclick="showMenu()">Back to Menu</button>
+      <p id="result"></p>
+    </div>
+  </div>
+
+  <script>
+    let currentLevel = 1;
+    let maxNumber = 50;
+    let attemptsLeft = 5;
+    let randomNumber;
+
+    // Initialize the game
+    function startGame() {
+      resetGame();
+      hideAll();
+      document.getElementById('play-screen').classList.remove('hidden');
+    }
+
+    // Reset the game for the current level
+    function resetGame() {
+      randomNumber = Math.floor(Math.random() * maxNumber) + 1;
+      attemptsLeft = 5;
+      document.getElementById('result').textContent = '';
+      document.getElementById('guess').value = '';
+      updateGameInfo();
+    }
+
+    // Update level and attempt information
+    function updateGameInfo() {
+      document.getElementById('level-info').textContent = `Level ${currentLevel}: Guess a number between 1 and ${maxNumber}`;
+      document.getElementById('attempts-info').textContent = `Attempts Left: ${attemptsLeft}`;
+    }
+
+    // Handle the player's guess
+    function submitGuess() {
+      const guess = Number(document.getElementById('guess').value);
+      const result = document.getElementById('result');
+
+      if (!guess || guess < 1 || guess > maxNumber) {
+        result.textContent = `Please enter a valid number between 1 and ${maxNumber}.`;
+        result.style.color = 'red';
+        return;
+      }
+
+      attemptsLeft--;
+
+      if (guess === randomNumber) {
+        result.textContent = `🎉 Correct! You've completed Level ${currentLevel}.`;
+        result.style.color = 'green';
+        nextLevel();
+      } else if (attemptsLeft > 0) {
+        result.textContent = guess < randomNumber ? 'Too low! Try again.' : 'Too high! Try again.';
+        result.style.color = 'blue';
+      } else {
+        result.textContent = `💀 Game Over! The number was ${randomNumber}. Restarting level...`;
+        result.style.color = 'red';
+        resetGame();
+      }
+
+      updateGameInfo();
+    }
+
+    // Progress to the next level
+    function nextLevel() {
+      currentLevel++;
+      maxNumber += 50;
+      resetGame();
+    }
+
+    // Show the main menu
+    function showMenu() {
+      hideAll();
+      document.getElementById('menu-screen').classList.remove('hidden');
+    }
+
+    // Show the settings screen
+    function showSettings() {
+      hideAll();
+      document.getElementById('settings-screen').classList.remove('hidden');
+    }
+
+    // Hide all screens
+    function hideAll() {
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('menu-screen').classList.add('hidden');
+      document.getElementById('settings-screen').classList.add('hidden');
+      document.getElementById('play-screen').classList.add('hidden');
+    }
+
+    // Initial function to show the welcome screen
+    function showWelcome() {
+      hideAll();
+      document.getElementById('welcome-screen').classList.remove('hidden');
+    }
+
+    // Start with the welcome screen
+    showWelcome();
+  </script>
+</body>
+</html>
